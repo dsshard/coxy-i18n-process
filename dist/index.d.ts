@@ -1,6 +1,6 @@
-type ParamValues = Record<string, string | number | undefined>;
-type Options<T> = {
-    variables?: ParamValues;
+type ValueType = string | number | undefined;
+type Options<T, V> = {
+    variables?: Record<string, V>;
     key: keyof T;
 };
 type CreateOptions = {
@@ -8,8 +8,8 @@ type CreateOptions = {
     language: string;
 };
 declare function declOfNum(number: number, titles: string[]): string;
-declare function hasI18nKey<T>(content: T, options: Options<T>): boolean;
-declare function processI18N<T>(content: T, options: Options<T>): string;
+declare function hasI18nKey<T>(content: T, options: Options<T, ValueType>): boolean;
+declare function processI18N<T, V = ValueType, R = string>(content: T, options: Options<T, V>): R;
 declare function mergeContent<T>(contents: Array<T>, options: CreateOptions): T[keyof T];
 
-export { declOfNum, hasI18nKey, mergeContent, processI18N };
+export { type CreateOptions, type Options, type ValueType, declOfNum, hasI18nKey, mergeContent, processI18N };
