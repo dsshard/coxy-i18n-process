@@ -1,11 +1,11 @@
-type ParamValues = Record<string, string | number | undefined | JSX.Element>
+export type ValueType = string | number
 
-type Options<T> = {
-  variables?: ParamValues
+export type Options<T, V> = {
+  variables?: Record<string, V>
   key: keyof T
 }
 
-type CreateOptions = {
+export type CreateOptions = {
   fallback: string
   language: string
 }
@@ -15,12 +15,12 @@ export function declOfNum(number: number, titles: string[]): string {
   return titles[number % 100 > 4 && number % 100 < 20 ? 2 : cases[number % 10 < 5 ? number % 10 : 5]]
 }
 
-export function hasI18nKey<T>(content: T, options: Options<T>): boolean {
+export function hasI18nKey<T>(content: T, options: Options<T, ValueType>): boolean {
   const { key } = options
   return !!content[key as string]
 }
 
-export function processI18N<T>(content: T, options: Options<T>): string | JSX.Element[] {
+export function processI18N<T, V = ValueType, R = string>(content: T, options: Options<T, V>): R {
   const { variables, key } = options
   let response = content[key as string]
 
@@ -30,7 +30,7 @@ export function processI18N<T>(content: T, options: Options<T>): string | JSX.El
 
   const { textVariables, jsxVariables } = Object.entries(variables).reduce<{
     textVariables: Record<string, string>
-    jsxVariables: { index: number; key: string; value: JSX.Element }[]
+    jsxVariables: { index: number; key: string; value: V }[]
   }>(
     (acc, [key, variable]) => {
       if (typeof variable === 'object') {
@@ -77,12 +77,12 @@ export function processI18N<T>(content: T, options: Options<T>): string | JSX.El
     const joinedKeys = orderedJSX.map((item) => `{{${item.key}}}`).join('|')
     const parts = response.split(new RegExp(joinedKeys, 'g'))
 
-    return orderedJSX.reduce<JSX.Element[]>((acc, variable, index) => {
-      acc.push(createElement(Fragment, {}, parts[index]))
-      acc.push(variable.value)
+    return orderedJSX.reduce<V[]>((acc, variable, index) => {
+      acc.push(parts[index] as never)
+      acc.push(variable.value as never)
 
       return acc
-    }, [])
+    }, []) as never
   }
 
   return response
