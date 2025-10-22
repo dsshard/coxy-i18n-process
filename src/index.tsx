@@ -81,6 +81,13 @@ export function processI18N<T, V = ValueType, R = string>(content: T, options: O
       acc.push(parts[index] as never)
       acc.push(variable.value as never)
 
+      const isLastItem = index === orderedJSX.length - 1
+      const nextPart = parts[index + 1]
+
+      if (isLastItem && nextPart) {
+        acc.push(nextPart as never)
+      }
+
       return acc
     }, []) as never
   }
